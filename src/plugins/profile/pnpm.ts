@@ -7,15 +7,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { resolveResourceRoot } from '../app-root.js';
+import { resolveResourceRoot, runtimePlatformDir } from '../app-root.js';
 
 /** 找自带的 node 运行时（resources/runtime/<platform>/bin/） */
 function bundledNode(): { cmd: string; binDir: string } | null {
-  const platform = process.platform === 'win32'
-    ? 'win-x64'
-    : (process.platform === 'darwin'
-      ? (process.arch === 'arm64' ? 'mac-arm64' : 'mac-x64')
-      : null);
+  const platform = runtimePlatformDir();
   if (!platform) return null;
   // 打包版走 process.resourcesPath，开发版回退源码推算（见 app-root.ts）
   const binDir = path.join(resolveResourceRoot(), 'runtime', platform, 'bin');

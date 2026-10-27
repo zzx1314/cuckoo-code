@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+- **Linux 支持**：electron-builder 新增 `linux` 目标（AppImage + deb）、`build:linux*` 脚本与 `.github/workflows/release.yml` 的 ubuntu 构建任务；`scripts/fetch-runtime.mjs` / `src/infra/paths.ts` / `plugins/app-root` 新增 `linux-x64` / `linux-arm64` 运行时目录，自带 uv/node 在 Linux 上可用（MCP、插件安装、pnpm 均生效）。
+- **平台映射单测**：`test/infra/platform.test.js`、`test/plugins/app-root.test.js` 覆盖平台目录映射与两份实现一致性。
+
+### Changed
+- **pwsh 工具跨平台**：Windows 仍用 `powershell`，Linux/macOS 改用 `pwsh`；未安装 PowerShell 7 时返回明确提示（建议改用 bash），不再报无意义的 `[exit code: 1]`。
+- **asarUnpack**：ripgrep 解包规则改为 `@vscode/ripgrep-*` 通配，Linux/macOS 的 ripgrep 二进制同样能在打包后 spawn。
+
 ## [0.8.18] - 2026-10-26
 
 ### Added

@@ -10,6 +10,23 @@
 | `npm test` | Vitest |
 | `npm run lint` | ESLint |
 | `npm run build:win:local` | 本地打 Windows 包 |
+| `npm run build:mac:local` | 本地打 macOS 包 |
+| `npm run build:linux:local` | 本地打 Linux 包（AppImage + deb） |
+| `npm run fetch-runtime` | 下载自带运行时（uv/node/pnpm，按当前平台） |
+
+发布用命令（打 GitHub Release）：`build:win` / `build:mac` / `build:linux`，或 `build`（当前系统）。
+
+### 打包平台支持
+
+| 平台目录 | 构建机 | 产物（`artifactName`） |
+|---|---|---|
+| `win-x64` | Windows x64 | `cuckoo-code-win-v<ver>-<arch>.exe`（NSIS） |
+| `mac-x64` / `mac-arm64` | macOS | `cuckoo-code-mac-v<ver>-<arch>.dmg` / `.zip` |
+| `linux-x64` / `linux-arm64` | Linux x64 / arm64 | `cuckoo-code-linux-v<ver>-<arch>.AppImage` / `.deb` |
+
+`resources/runtime/` 里的 uv/node 由 `scripts/fetch-runtime.mjs` 按**构建机平台**下载（目录名见
+`src/infra/platform.ts`），所以**交叉架构打包**（如 x64 机器出 arm64 包）要先把对应平台的运行时放进
+`resources/runtime/`，否则包内自带的 uv/node 架构不匹配。
 
 ## compile 的三步
 

@@ -12,6 +12,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
+import { runtimePlatformDir } from './platform.js';
 
 // electron 特殊：其 index.js 导出字符串，须用 createRequire（见 P3a 手册 1.5）
 const require = createRequire(import.meta.url);
@@ -34,14 +35,11 @@ export function resolveSrc(rel: string): string {
  * 自带运行时（uv/node）的 bin 目录。
  * 打包后位于 resources/runtime/<platform>/bin/（asar 外）；
  * 开发时位于 <项目根>/resources/runtime/<platform>/bin/。
+ * 平台目录名见 infra/platform.ts（win-x64 / mac-x64 / mac-arm64 / linux-x64 / linux-arm64）。
  * @returns bin 目录绝对路径（不存在返回 null）
  */
 export function resolveRuntimeBinDir(): string | null {
-  const platform = process.platform === 'win32'
-    ? 'win-x64'
-    : (process.platform === 'darwin'
-      ? (process.arch === 'arm64' ? 'mac-arm64' : 'mac-x64')
-      : null);
+  const platform = runtimePlatformDir();
   if (!platform) return null;
   const candidates = [
     path.join(process.resourcesPath || '', 'runtime', platform, 'bin'),

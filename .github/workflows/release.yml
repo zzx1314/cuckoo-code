@@ -18,6 +18,8 @@ jobs:
             command: build:win:local
           - os: macos-latest
             command: build:mac:local
+          - os: ubuntu-latest
+            command: build:linux:local
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -60,6 +62,8 @@ jobs:
             dist/*.blockmap
             dist/*.zip
             dist/*.dmg
+            dist/*.AppImage
+            dist/*.deb
             dist/latest*.yml
           retention-days: 30
 
@@ -92,4 +96,6 @@ jobs:
             dist/*.blockmap
             dist/*.zip
             dist/*.dmg
+            dist/*.AppImage
+            dist/*.deb
             dist/latest*.yml

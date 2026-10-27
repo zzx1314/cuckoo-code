@@ -12,6 +12,22 @@
 import path from 'node:path';
 import fs from 'node:fs';
 
+/**
+ * 当前平台/架构对应的内置运行时目录名（resources/runtime/<dir>）。
+ * 与 infra/platform.ts、scripts/fetch-runtime.mjs 的映射保持一致
+ * （plugins 不能依赖 infra，故此处保留一份等价实现）。
+ * @returns 目录名；不支持的平台返回 null
+ */
+export function runtimePlatformDir(
+  platform: string = process.platform,
+  arch: string = process.arch,
+): string | null {
+  if (platform === 'win32') return arch === 'x64' ? 'win-x64' : null;
+  if (platform === 'darwin') return arch === 'arm64' ? 'mac-arm64' : 'mac-x64';
+  if (platform === 'linux') return arch === 'arm64' ? 'linux-arm64' : 'linux-x64';
+  return null;
+}
+
 /** 找应用根（开发=项目根；打包=resources 同级目录），用于拼 resources/runtime 等内置资源 */
 export function resolveResourceRoot(): string {
   // 打包版：process.resourcesPath 指向 resources/，resources/runtime 直接存在

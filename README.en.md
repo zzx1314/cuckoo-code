@@ -8,7 +8,7 @@
   <a href="https://github.com/wangyongpeng90/cuckoo-code/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square" alt="License"></a>
   <a href="https://github.com/wangyongpeng90/cuckoo-code"><img src="https://img.shields.io/github/stars/wangyongpeng90/cuckoo-code?style=flat-square&color=yellow" alt="Stars"></a>
   <a href="https://github.com/wangyongpeng90/cuckoo-code/releases"><img src="https://img.shields.io/github/downloads/wangyongpeng90/cuckoo-code/total?style=flat-square&color=green" alt="Downloads"></a>
-  <a href="https://github.com/wangyongpeng90/cuckoo-code"><img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS-8b93ff?style=flat-square" alt="Platform"></a>
+  <a href="https://github.com/wangyongpeng90/cuckoo-code"><img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-8b93ff?style=flat-square" alt="Platform"></a>
   <a href="https://github.com/wangyongpeng90/cuckoo-code"><img src="https://img.shields.io/badge/Electron-33-47848f?style=flat-square&logo=electron&logoColor=white" alt="Electron"></a>
 </p>
 
@@ -288,8 +288,8 @@ cuckoo-code/
 
 ## Build and Release
 
-- This repository has GitHub Actions configured. Pushing a `v*` tag (e.g. `v0.7.1`) automatically builds Windows and macOS installers and publishes them to Releases
-- Local manual builds: `npm run build:win:local` or `npm run build:mac:local`
+- This repository has GitHub Actions configured. Pushing a `v*` tag (e.g. `v0.7.1`) automatically builds Windows, macOS and Linux installers and publishes them to Releases
+- Local manual builds: `npm run build:win:local`, `npm run build:mac:local` or `npm run build:linux:local` (Linux outputs AppImage + deb)
 - Build output goes to the `dist/` directory
 
 ---

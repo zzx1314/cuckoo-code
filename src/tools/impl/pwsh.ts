@@ -5,6 +5,7 @@ import { execFile } from 'node:child_process';
 import path from 'node:path';
 import { decodeOutput } from '../../infra/decode-output.js';
 import { isDangerous, DANGEROUS_CMDS } from '../../infra/dangerous-commands.js';
+import { powershellBin, powershellHint } from '../../infra/platform.js';
 
 // ========== D12：API 契约元数据（构建期生成 api.d.ts）==========
 export const apiMetas: ToolApiMeta[] = [
@@ -24,7 +25,7 @@ export const apiMetas: ToolApiMeta[] = [
       '}',
     ].join('\n'),
     doc: [
-      '执行 PowerShell 命令（powershell -NoProfile -Command）。',
+      '执行 PowerShell 命令（Windows 用 powershell，Linux/macOS 用 pwsh，均带 -NoProfile -Command）。',
       '返回纯文本：stdout + [stderr] 分节 + 状态标记（[exit code]、[timed out]）。',
       '必须用 log() 方法打印才能看到返回内容。',
       '非零退出不抛异常，通过 [exit code] 标记报告。',
@@ -87,7 +88,7 @@ class PwshTool extends Tool {
     return {
       name: 'tool:pwsh',
       order: 106,
-      text: '执行 PowerShell 命令（powershell -NoProfile -Command）并返回 stdout/stderr。每次调用在全新 pwsh 进程中运行：状态不会跨调用保留——请用 workdir 参数而非 cd。路径使用 Windows 原生形式（C:\\...）；用 $env:NAME 读取环境变量。非零退出以 [exit code: N] 标记报告。'
+      text: '执行 PowerShell 命令（Windows 用 powershell，Linux/macOS 用 pwsh）并返回 stdout/stderr。每次调用在全新 pwsh 进程中运行：状态不会跨调用保留——请用 workdir 参数而非 cd。路径用平台原生形式（Windows 为 C:\\...，Linux/macOS 为 /...）；用 $env:NAME 读取环境变量。非零退出以 [exit code: N] 标记报告。'
     };
   }
 
@@ -126,12 +127,19 @@ class PwshTool extends Tool {
 
       console.log('[PwshTool] 执行命令: ' + trimmed + ', cwd=' + workDir);
 
+      const shellBin = powershellBin();
+
       return await new Promise<ToolResult>((resolve) => {
         execFile(
-          'powershell',
+          shellBin,
           ['-NoProfile', '-Command', trimmed],
           { cwd: workDir, timeout, maxBuffer: 1024 * 1024, windowsHide: true, encoding: 'buffer' },
           (error, stdout, stderr) => {
+            // 非 Windows 上没有 PowerShell 时给出明确提示（execFile 的 ENOENT）
+            if (error && (error as any).code === 'ENOENT') {
+              resolve(ToolResult.error(powershellHint(shellBin)));
+              return;
+            }
             const out = decodeOutput(stdout);
             const err = decodeOutput(stderr);
 

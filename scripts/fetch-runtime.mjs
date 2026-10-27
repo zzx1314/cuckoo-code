@@ -26,6 +26,8 @@ function currentPlatform() {
   if (p === 'win32' && a === 'x64') return 'win-x64';
   if (p === 'darwin' && a === 'x64') return 'mac-x64';
   if (p === 'darwin' && a === 'arm64') return 'mac-arm64';
+  if (p === 'linux' && a === 'x64') return 'linux-x64';
+  if (p === 'linux' && a === 'arm64') return 'linux-arm64';
   throw new Error('不支持的平台: ' + p + '-' + a);
 }
 
@@ -34,6 +36,8 @@ function uvAsset(platform) {
     'win-x64': 'uv-x86_64-pc-windows-msvc.zip',
     'mac-x64': 'uv-x86_64-apple-darwin.tar.gz',
     'mac-arm64': 'uv-aarch64-apple-darwin.tar.gz',
+    'linux-x64': 'uv-x86_64-unknown-linux-gnu.tar.gz',
+    'linux-arm64': 'uv-aarch64-unknown-linux-gnu.tar.gz',
   };
   return map[platform];
 }
@@ -44,6 +48,8 @@ function nodeAsset(platform) {
     'win-x64': 'node-' + v + '-win-x64.zip',
     'mac-x64': 'node-' + v + '-darwin-x64.tar.gz',
     'mac-arm64': 'node-' + v + '-darwin-arm64.tar.gz',
+    'linux-x64': 'node-' + v + '-linux-x64.tar.gz',
+    'linux-arm64': 'node-' + v + '-linux-arm64.tar.gz',
   };
   return map[platform];
 }
@@ -57,6 +63,15 @@ function download(url, dest) {
 function extract(archive, dest) {
   fs.mkdirSync(dest, { recursive: true });
   if (archive.endsWith('.zip')) {
+    if (process.platform === 'linux') {
+      // GNU tar 不支持 zip，Linux 上优先用 unzip（zip 目前只有 Windows 运行时才会用到）
+      try {
+        execSync('unzip -oq "' + archive + '" -d "' + dest + '"', { stdio: 'inherit' });
+        return;
+      } catch (err) {
+        console.warn('[runtime] unzip 不可用，回退 tar: ' + (err && err.message));
+      }
+    }
     execSync('tar -xf "' + archive + '" -C "' + dest + '"', { stdio: 'inherit' });
   } else if (archive.endsWith('.tar.gz') || archive.endsWith('.tgz')) {
     execSync('tar -xzf "' + archive + '" -C "' + dest + '"', { stdio: 'inherit' });
